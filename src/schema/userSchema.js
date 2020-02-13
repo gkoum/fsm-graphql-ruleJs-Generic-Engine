@@ -29,5 +29,6 @@ export default gql`
     email: String!
     role: String
     messages: [Message!]
+    applications: [Application!]
   }
 `;

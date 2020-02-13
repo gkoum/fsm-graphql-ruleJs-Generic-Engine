@@ -1,9 +1,9 @@
-import Sequelize from 'sequelize';
+import Sequelize from 'sequelize'
 
 let sequelize;
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
+    dialect: 'mysql',
   });
 } else {
   sequelize = new Sequelize(
@@ -11,22 +11,34 @@ if (process.env.DATABASE_URL) {
     process.env.DATABASE_USER,
     process.env.DATABASE_PASSWORD,
     {
-      dialect: 'postgres',
+      host: 'localhost',
+      dialect: 'mysql',
     },
   );
 }
 
 const models = {
-  User: sequelize.import('./user'),
-  Message: sequelize.import('./message'),
+  User: sequelize.import('./userModel'),
+  Message: sequelize.import('./messageModel'),
+  Application: sequelize.import('./applicationModel'),
+  Fsm: sequelize.import('./fsmModel')
 };
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
-    models[key].associate(models);
+    models[key].associate(models)
   }
-});
+})
 
-export { sequelize };
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection to DB has been established successfully.')
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err)
+  })
 
-export default models;
+export { sequelize }
+
+export default models

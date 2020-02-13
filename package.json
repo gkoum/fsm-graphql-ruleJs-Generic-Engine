@@ -8,9 +8,9 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
-    "test:run-server": "TEST_DATABASE=mytestdatabase npm start",
-    "test:execute-test": "mocha --require @babel/register 'src/**/*.spec.js'",
-    "test": "echo \"No test specified\" && exit 0"
+    "test-server": "set TEST_DATABASE=graphqltestdb&& npm start",
+    "execute-test": "mocha --require @babel/register 'src/**/*.spec.js'",
+    "test": "mocha --require @babel/register \"./src/**/*.spec.js*\""
   },
   "keywords": [],
   "author": "Robin Wieruch <hello@rwieruch.com> (https://www.robinwieruch.de)",
@@ -29,7 +29,8 @@
   "dependencies": {
     "apollo-server": "^2.2.3",
     "apollo-server-express": "^2.2.3",
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^3.0.7",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^1.4.0",
     "dotenv": "^6.1.0",
@@ -38,8 +39,9 @@
     "graphql-iso-date": "^3.6.1",
     "graphql-resolvers": "^0.2.2",
     "jsonwebtoken": "^8.4.0",
-    "pg": "^7.6.1",
-    "sequelize": "^4.41.2",
-    "uuid": "^3.3.2"
+    "lodash": "^4.17.15",
+    "mysql2": "^2.1.0",
+    "rules-js": "^1.0.0",
+    "sequelize": "^5.21.4"
   }
 }

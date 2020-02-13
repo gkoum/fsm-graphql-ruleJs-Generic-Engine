@@ -12,6 +12,7 @@ const fromCursorHash = string =>
 export default {
   Query: {
     messages: async (parent, { cursor, limit = 100 }, { models }) => {
+      console.log('--------------------messages')
       const cursorOptions = cursor
         ? {
             where: {
@@ -42,7 +43,8 @@ export default {
       };
     },
     message: async (parent, { id }, { models }) => {
-      return await models.Message.findById(id);
+      console.log('--------------------message', id)
+      return await models.Message.findByPk(id);
     },
   },
 
@@ -74,6 +76,7 @@ export default {
 
   Message: {
     user: async (message, args, { loaders }) => {
+      console.log('----------loaders in message', message.userId)
       return await loaders.user.load(message.userId);
     },
   },

@@ -30,25 +30,39 @@ const user = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.STRING,
     },
-  });
+  })
 
   User.associate = models => {
     User.hasMany(models.Message, { onDelete: 'CASCADE' });
-  };
+  }
+
+  User.associate = models => {
+    User.hasMany(models.Application, { onDelete: 'CASCADE' });
+  }
 
   User.findByLogin = async login => {
     let user = await User.findOne({
       where: { username: login },
-    });
+    })
 
     if (!user) {
       user = await User.findOne({
         where: { email: login },
-      });
+      })
     }
 
-    return user;
-  };
+    return user
+  }
+
+  User.validateUser = async user => {
+    // check Authorizaton and return it
+    return {
+      user: user,
+      roles: ['prechecker', 'proponent'],
+      canIssueEvent: true,
+      subjectBelongsToUser: true
+    }
+  }
 
   User.beforeCreate(async user => {
     user.password = await user.generatePasswordHash();

@@ -17,9 +17,24 @@ export const isMessageOwner = async (
   { id },
   { models, me },
 ) => {
-  const message = await models.Message.findById(id, { raw: true });
+  console.log('isMessageOwner', id)
+  const message = await models.Message.findByPk(id, { raw: true });
 
   if (message.userId !== me.id) {
+    throw new ForbiddenError('Not authenticated as owner.');
+  }
+
+  return skip;
+};
+export const isApplicationOwner = async (
+  parent,
+  { id },
+  { models, me },
+) => {
+  console.log('isApplicationOwner', id)
+  const application = await models.Application.findByPk(id, { raw: true });
+
+  if (application.userId !== me.id) {
     throw new ForbiddenError('Not authenticated as owner.');
   }
 

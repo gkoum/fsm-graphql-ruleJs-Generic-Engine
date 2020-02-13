@@ -26,6 +26,7 @@ const getMe = async req => {
 
   if (token) {
     try {
+      console.log(token)
       return await jwt.verify(token, process.env.SECRET);
     } catch (e) {
       throw new AuthenticationError(
@@ -38,6 +39,7 @@ const getMe = async req => {
 const server = new ApolloServer({
   introspection: true,
   playground: true,
+  tracing: true,
   typeDefs: schema,
   resolvers,
   formatError: error => {
@@ -88,6 +90,7 @@ server.installSubscriptionHandlers(httpServer);
 
 const isTest = !!process.env.TEST_DATABASE;
 const isProduction = !!process.env.DATABASE_URL;
+const isDevelopment = !!process.env.DATABASE;
 const port = process.env.PORT || 8000;
 
 sequelize.sync({ force: isTest || isProduction }).then(async () => {
