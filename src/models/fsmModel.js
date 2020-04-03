@@ -1,6 +1,7 @@
 const lodash = require('lodash')
 const { fsmImage } = require('../models/fsmImage')
 const Engine = require("rules-js")
+const ruleEngine = require("../ruleEngine/rules")
 const { services } = require('../services/services')
 
 const fsm = (sequelize, DataTypes) => {
@@ -21,13 +22,10 @@ const fsm = (sequelize, DataTypes) => {
     // Locate transition if available and validate if possible
     const transitions = fsmImage.transitions.filter(trans => trans.atEvent === event)
     if (transitions.length < 1) {
-      console.log('Transition not Supported for this Event')
+      console.log('No transitions are supported for this Event')
       return false
-    } else if (transitions.length === 1) {
-      console.log('One Transition exists for event: ' + transitions[0])
-      return transitions[0]
     } else {
-      console.log('More than one transition can be fired: ')
+      console.log('One or More transitions can be fired: ')
       // see precondition values to locate the exact transition hasValue: [{ judgment: { pending: false }}],
       // make the assumption that the object will be the same in the request as in hasValue???
       let subjectPreconditionHasValue = body
@@ -69,80 +67,41 @@ const fsm = (sequelize, DataTypes) => {
     return false
   }
 
-  Fsm.executePreActions = ({ application: body, transition: transition } = {}) => {
-    console.log('executePreActions') // , application, values)
-    if (transition.preconditions.services.length === 0) {
-      return true
-    } else {
-      // for each key find the function and run it with parameters
-      // if more than one consider the rule engine which creates a common context and facts
+  Fsm.executePreActions = async ({ fsmSubject: fsmSubject, transition: transition } = {}) => {
+    console.log('executePreActions') // , fsmSubject, values)
+    if (transition.preconditions.services) {
+      const promises = transition.preconditions.services.map(async ser => {
+        let serviceName = Object.keys(ser)[0]
+        console.log('---executing: ', serviceName)
+        let servicesResults = await services[serviceName](ser[Object.keys(ser)].params, { fsmSubject: fsmSubject, transition: transition })
+        console.log(serviceName, '---executed with results: ', servicesResults)
+        return servicesResults
+      })
+      const servicesExecuted = await Promise.all(promises)
+      console.log(servicesExecuted)
+    } else if (transition.preconditions.servicesRules) {
+      await ruleEngine.run({ fsmSubject: fsmSubject, transition: transition }).then(result => {
+        console.log("---engine results: ", result)
+      })
     }
     return true
   }
 
-  Fsm.applyEffects = ({ application: application, transition: transition } = {}) => {
-    console.log('applyEffects') // , application, values)
-    console.log(transition.name)
+  Fsm.applyEffects = async ({ fsmSubject: fsmSubject, transition: transition, body: body } = {}) => {
+    console.log('---ΑpplyEffects', body) // , application, values)
     if (transition.effects.services) {
-      // will call all services sync but we need async and await between them
-      transition.effects.services.forEach(ser => {
+      const promises = transition.effects.services.map( async ser => {
         let serviceName = Object.keys(ser)[0]
-        services[serviceName](ser[Object.keys(ser)].params)
+        console.log('---executing: ', serviceName)
+        let servicesResults = await services[serviceName](ser[Object.keys(ser)].params, { fsmSubject: fsmSubject, transition: transition })
+        console.log(serviceName, '---executed with results: ', servicesResults)
+        return servicesResults
       })
+      const servicesExecuted = await Promise.all(promises)
+      console.log(servicesExecuted)
     } else if (transition.effects.servicesRules) {
-      const parameters = { application: application, transition: transition }
-      const engine = new Engine()
-
-      engine.closures.add("always", (fact, context) => {
-        console.log("always", fact, context.parameters)
-        return true
-      })
-
-      engine.closures.add("insertJudgment", (fact, context) => {
-        console.log("insertJudgment", context.parameters)
-        return fact
-      })
-
-      function delay(t, v) {
-        return new Promise(function (resolve) {
-          setTimeout(resolve.bind(null, v), t)
-        });
-      }
-
-      engine.closures.add("findHistoryNextStep", async (fact, context) => {
-        console.log("findHistoryNextStep", context.parameters)
-        fact.nextStep = delay(3000, {
-          date: Date.now(),
-          dateCompleted: "",
-          applicationStatus: "userW_",
-          user: { id: null, name: null, surname: null },
-        })
-        await fact.nextStep
-        return fact
-      })
-      engine.closures.add("insertStep", (fact, context) => {
-        console.log("insertStep", fact.nextStep, context.parameters)
-        fact.application.history = fact.nextStep
-        return fact
-      })
-
-      engine.closures.add("saveDB", (fact, context) => {
-        fact.application.history.then(mes => console.log("saveDB" + mes))
-        console.log("saveDB", fact.application.history.then(mes => mes), fact, context.parameters)
-        return fact
-      })
-
-      engine.closures.add("isApplicationValid", (fact, context) => {
-        console.log("isApplicationValid", fact.nextStep, context.parameters)
-        return fact
-      })
-
-      engine.add(transition.effects.servicesRules);
-      engine.process(transition.effects.servicesRules.name, parameters).then(result => {
-        // console.log("result", result);
-        const resultingDispatchOrder = result.fact;
-        // console.log(resultingDispatchOrder)
-        // handle the result in any way
+      await ruleEngine.run({ fsmSubject: fsmSubject, transition: transition }).then(result => {
+        console.log("---engine results: ", result)
       })
     }
     return true

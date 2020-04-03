@@ -25,10 +25,37 @@ export default gql`
 
   type User {
     id: ID!
-    username: String!
-    email: String!
-    role: String
-    messages: [Message!]
+    name: String!
+    firstname: String!
+    surname: String
+    gender: String
     applications: [Application!]
+    fathersName: String
+    mothersName: String
+    birthdate: String
+    countryId: ID
+    addressArea: String
+    addressCity: String
+    addressStreet: String
+    addressZipcode: String
+    mobilePhone: String
+    email: String
+    adtNo: String
+    afm: String
+    password: String
+    rememberToken: String
+    createdAt: String
+    updateAt: String
+    visa: String
+    fromVisa: String
+    toVisa: String
+    landline: String
+    countryOfBirthId: ID
+    cityOfBirth: String
+    bidx: String
+    foreignIdNum: String
+    foreignIdCountry: String
+    foreignerbidx: String
+    bidxBirthdate: String
   }
 `;

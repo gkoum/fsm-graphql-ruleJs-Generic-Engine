@@ -1,3 +1,5 @@
+const { structures } = require('../structures/structures')
+
 const application = (sequelize, DataTypes) => {
   const Application = sequelize.define('application', {
     protocol: {
@@ -27,17 +29,21 @@ const application = (sequelize, DataTypes) => {
     }
   })
 
-  Application.associate = models => {
-    Application.belongsTo(models.User)
-  }
+  // Application.associate = models => {
+  //   Application.belongsTo(models.User)
+  // }
 
-  Application.validateEventForSubject = ({ application: application, values: values } = {}) => {
-    console.log('validateEventForSubject') // , application, values)
+  Application.validateEventForSubject = ({ application: application, event: event } = {}) => {
+    // if application.state can accept the incoming event... same as validateTransitionRequest?
+    console.log('---validateEventForSubject') // , application, values)
     return true
   }
 
-  Application.validateStructure = ({ application: application, values: values } = {}) => {
-    console.log('validateStructure') // , application, values)
+  Application.validateStructure = ({ application: application, structure: structure } = {}) => {
+    console.log('---validateStructure', application, structure)
+    if (structures[structure] instanceof Function) {
+      structures[structure](application)
+    }
     return true
   }
 

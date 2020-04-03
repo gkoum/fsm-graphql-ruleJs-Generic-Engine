@@ -1,9 +1,10 @@
 import { gql } from 'apollo-server-express';
-
+// applications(cursor: String, limit: Int): ApplicationConnection!
 export default gql`
   extend type Query {
-    applications(cursor: String, limit: Int): ApplicationConnection!
-    application(id: ID!): Application!
+    applications: [Application]
+    application(id: ID!): Application
+    applicationHistory(id: ID!): [String]
   }
 
   extend type Mutation {
@@ -17,12 +18,12 @@ export default gql`
   }
 
   type Application {
-    id: ID!
+    id: ID
     personalDetails: PersonalDetails
     title: Title
     titleConsideration: Title
-    history: History
-    user: User!
+    history: [String]
+    user: User
   }
 
   type PersonalDetails {
@@ -37,8 +38,8 @@ export default gql`
   }
 
   type History {
-    id: ID!
-    judgement: String
+    id: ID
+    comments: String
   }
   
   extend type Subscription {

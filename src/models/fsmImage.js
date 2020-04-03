@@ -1,3 +1,5 @@
+import calcUserFinalSavedAppStructure from '../structures/structures'
+
 module.exports.fsmImage = {
   validateUser: function (userId, token) {
     console.log(`received id: ${userId} and token: ${token} and start async user validation`)
@@ -6,28 +8,58 @@ module.exports.fsmImage = {
     return this.transitions.find(trans => trans.atEvent === event && trans.from == currentState);
   },
   states: [
-    { name: 'userW_', description: 'Εξωτερικός Χρήστης' },
-    { name: 'precheckersQueue', description: 'Ουρά προελέγχου' },
-    { name: 'precheckerW_', description: 'Προέλεγχος' },
-    { name: 'presidentW_Prechecker', description: 'Πρόεδρος από Προέλεγχο' },
-    { name: 'proponentW_President', description: 'Εισηγητής από Πρόεδρο' },
-    { name: 'proponentW_Board', description: 'Εισηγητής από Εκτελεστική επιτροπή' },
-    { name: 'viewerW_Proponent', description: 'Έλεγχος από Εισηγητή' },
-    { name: 'viewerW_Vice', description: 'Έλεγχος από Αντιπρόεδρο' },
-    { name: 'viewerW_Board', description: 'Έλεγχος από Εκτελεστική επιτροπή' },
-    { name: 'viceW_President', description: 'Αντιπρόεδρος από Πρόεδρο' },
-    { name: 'boardW_President', description: 'Εκτελεστική επιτροπή από Πρόεδρο' },
-    { name: 'boardW_Proponent', description: 'Εκτελεστική επιτροπή από Εισηγητή' },
-    { name: 'boardW_Consultant', description: 'Εκτελεστική επιτροπή από Ακαδημαϊκό' },
-    { name: 'printDecisionW_', description: 'Καταχωρητής Απόφασης' },
-    { name: 'presidentW_PrintDecision', description: 'Πρόεδρος από Καταχωρητή' },
-    { name: 'president_finalized', description: 'Ολοκληρωμένη-Παραλαβή' },
-    { name: 'consultantW_Proponent', description: 'Ακαδημαϊκός Σύμβουλος από Εισηγητή' },
-    { name: 'presidentW_Viewer', description: 'Πρόεδρος' },
-    { name: 'boardW_', description: 'Εκτελεστική επιτροπή' },
-    { name: 'REDIRECTION_NEEDED', description: 'Επαναδρομολόγηση' },
-    { name: 'printDecisionW_President', description: 'Ουρά καταχωρητών' },
-    { name: 'deactivated', description: 'Απενεργοποιημένη' }
+    { name: 'Χρήστης', description: 'Εξωτερικός Χρήστης', params: { x: -600, y: -300 } },
+    { name: 'Προέλεγχος', params: { x: -400, y: -300 }, description: 'Εξωτερικός Χρήστης' },
+    { name: 'Εισηγητής', params: { x: -200, y: -300 }, description: 'Εξωτερικός Χρήστης' },
+    {
+      name: 'Πρόεδρος', description: 'Εξωτερικός Χρήστης',
+      params: {x: 10, y: -300}
+    },
+    {
+      name: 'Διοικιτηκός', description: 'Εξωτερικός Χρήστης',
+      params: { x: 200, y: -300 }
+      
+    },
+    {
+      name: 'Συμβούλιο', description: 'Εξωτερικός Χρήστης',
+      params: { x: 400, y: -300 }
+      
+    },
+    {
+      name: 'Ακαδημαικός', description: 'Εξωτερικός Χρήστης',
+      params: { x: 600, y: -300 }
+      
+    },
+    {
+      name: 'Αντιπρόεδρος', description: 'Εξωτερικός Χρήστης',
+      params: { x: 800, y: -300 }
+      
+    },
+    {
+      name: 'Print', description: 'Εξωτερικός Χρήστης',
+      params: { x: 1000, y: -300 }
+      
+    },
+    { name: 'userW_', description: 'Εξωτερικός Χρήστης', params: { x: -600, y: -250 } },
+    { name: 'precheckersQueue', description: 'Ουρά προελέγχου', params: { x: -400, y: -250 } },
+    { name: 'precheckerW_', description: 'Προέλεγχος', params: { x: -400, y: 200 } },
+    { name: 'presidentW_Prechecker', description: 'Πρόεδρος από Προέλεγχο', params: { x: 10, y: -250 } },
+    { name: 'proponentW_President', description: 'Εισηγητής από Πρόεδρο', params: { x: -200, y: -250 } },
+    { name: 'proponentW_Board', description: 'Εισηγητής από Εκτελεστική επιτροπή', params: { x: -200, y: 200 } },
+    { name: 'viewerW_Proponent', description: 'Έλεγχος από Εισηγητή', params: { x: 200, y: -250 } },
+    { name: 'viewerW_Vice', description: 'Έλεγχος από Αντιπρόεδρο', params: { x: 200, y: 100 } },
+    { name: 'viewerW_Board', description: 'Έλεγχος από Εκτελεστική επιτροπή', params: { x: 200, y: 350 } },
+    { name: 'viceW_President', description: 'Αντιπρόεδρος από Πρόεδρο', params: { x: 800, y: -250 } },
+    { name: 'boardW_President', description: 'Εκτελεστική επιτροπή από Πρόεδρο', params: { x: 400, y: -250 } },
+    { name: 'boardW_Proponent', description: 'Εκτελεστική επιτροπή από Εισηγητή', params: { x: 400, y: -10 } },
+    { name: 'boardW_Consultant', description: 'Εκτελεστική επιτροπή από Ακαδημαϊκό', params: { x: 400, y: 320 } },
+    { name: 'printDecisionW_', description: 'Καταχωρητής Απόφασης', params: { x: 1000, y: -200 } },
+    { name: 'presidentW_PrintDecision', description: 'Πρόεδρος από Καταχωρητή', params: { x: 10, y: 100 } },
+    { name: 'consultantW_Proponent', description: 'Ακαδημαϊκός Σύμβουλος από Εισηγητή', params: { x: 600, y: -100 } },
+    { name: 'presidentW_Viewer', description: 'Πρόεδρος', params: { x: 10, y: 400 } },
+    { name: 'printDecisionW_President', description: 'Ουρά καταχωρητών', params: { x: 1000, y: -10 } },
+    { name: 'finalized', description: 'Ολοκληρωμένη-Παραλαβή', params: { x: 10, y: 500 } },
+    { name: 'forArchive', description: 'Για το αρχείο', params: { x: 10, y: 600 } }
   ],
   events: [
     { name: 'userTempSaved', description: '', body: {} },
@@ -35,7 +67,7 @@ module.exports.fsmImage = {
     { name: 'precheckerTempSaved', description: '', body: {} },
     { name: 'boardMemberTempSaved', description: '', body: {} },
     //
-    { name: 'created', description: '', body: {} },
+    { name: 'newApplication', description: '', body: {} },
     { name: 'userFinalSaved', description: '', body: {} },
     { name: 'precheckerFinalSaved', description: 'x2', body: {} },
     { name: 'selectedByPrechecker', description: '', body: {} },
@@ -54,15 +86,17 @@ module.exports.fsmImage = {
     { name: 'presidentBoardDisagreement', description: 'to vice', body: {} },
     { name: 'viceDCDecision', description: 'to viewer', body: {} },
     { name: 'printForSigning', description: 'to president', body: {} },
+    { name: 'selectedByPrint', description: '', body: {} },
     { name: 'presidentSigned', description: 'waitForDownload', body: {} },
     { name: 'actdownloadedByUser', description: 'waitForDownload', body: {} },
   ],
   transitions: [
-    { name: 'created',
-      description: 'User concludes working on an application',
-      from: null,
+    {
+      name: 'newApplication',
+      description: 'User creates a new application',
+      from: '',
       to: 'userW_',
-      atEvent: 'created',
+      atEvent: 'newApplication',
       preconditions: {
         request: {
           hasStructure: {
@@ -70,7 +104,7 @@ module.exports.fsmImage = {
           },
           hasValue: {},
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -79,7 +113,8 @@ module.exports.fsmImage = {
         },
         services: [
           { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
-          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } },
+          { notifyUser: { params: { application: {} }, execution: 'async' } }
         ]
       }
     },
@@ -90,22 +125,28 @@ module.exports.fsmImage = {
       atEvent: 'userFinalSaved',
       preconditions: {
         request: {
-          hasStructure: {
-            application: {}
-          },
-          hasValue: {},
+          hasStructure: 'calcUserFinalSavedAppStructure',
+            // if(app.consideration) include titleConsideration
+            // I need to have the app in the context to calculate structure.. CONTEXT
+            // I have the body: requestBody from graphql for each request -> I need to get it here
+            // or join them in another file. So structure can be in a static json or be produced from a function
+            // application: userFinalSavedAppStructure(body)
+          hasValue: {application: {id: '1'}},
         },
-        services: {}
+        services: [] // [{ getApplicationDB: { params: { id: 'applicationId' }, return: { application: {} }, execution: 'sync' } }]
       },
       effects: {
         response: {
-          haStructure: { newState: 'isString' },
+          haStructure: '',
           hasValue: {}
         },
         services: [
-          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync'}},
-          { saveDB: { params: { application: {}, nextState: 'userW_' } } },
-          { notifyUser: { params: { application: {}, nextState: 'userW_' }, execution: 'async' } }
+          // application with the new step needs to be the context for the next two services.... rules?
+          // application will come from the context so params are only extra needed data
+          // modify application in the context and give it to saveDB
+          { insertHistoryStep: { params: { nextState: 'precheckersQueue' }, execution: 'sync'} },
+          { saveDB: { params: { application: {} }, execution: 'sync' } },
+          { notifyUser: { params: { application: {} }, execution: 'async' } }
         ]
       }
     },
@@ -123,7 +164,7 @@ module.exports.fsmImage = {
           },
           hasValue: { judgment: { pending: true }, userId: '1' },
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -131,9 +172,11 @@ module.exports.fsmImage = {
           hasValue: {}
         },
         services: [
+          {insertJudgment: { params: {} } }, // look for judgment and insert it to current step
           {
             insertHistoryStep: {
-              params: { application: {}, nextState: 'userW_' }, execution: 'sync'
+              params: { application: {}, nextState: 'userW_' },
+              execution: 'sync'
             }
           },
           { saveDB: { params: { application: {}, nextState: 'userW_' } } },
@@ -156,7 +199,7 @@ module.exports.fsmImage = {
           },
           hasValue: { judgment: { pending: false } },
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -165,20 +208,16 @@ module.exports.fsmImage = {
         },
         // rule engine creates a context and there is no need to carry params around like application
         servicesRules: {
-          "name": "precheckerFinalSavedEffectServices",
+          "name": "precheckerFinalSavedNoPendingEffectServices",
           "rules": [
             {
               "when": "always",
               "then": [
-                { "closure": "insertJudgment" },
+                "insertJudgment",
                 { "closure": "findHistoryNextStep", "newState": "userW_" },
-                { "closure": "insertStep" }
+                "insertStep",
+                "saveDB"
               ]
-            },
-            {
-              "name": "saveDB",
-              "when": { "closure": "isApplicationValid" },
-              "then": { "closure": "saveDB" }
             }
           ]
         }
@@ -194,7 +233,7 @@ module.exports.fsmImage = {
           hasStructure: {},
           hasValue: {},
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -231,7 +270,7 @@ module.exports.fsmImage = {
           hasStructure: {},
           hasValue: {},
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -270,7 +309,7 @@ module.exports.fsmImage = {
           },
           hasValue: {},
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -295,7 +334,7 @@ module.exports.fsmImage = {
           },
           hasValue: {},
         },
-        services: {}
+        services: []
       },
       effects: {
         response: {
@@ -308,8 +347,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'proponentFinalSavedSameTitle',
+    { name: 'proponentFinalSavedSameTitle',
       description: 'proponentFinalSavedSameTitle',
       from: 'proponentW_President',
       to: 'viewerW_Proponent',
@@ -321,7 +359,84 @@ module.exports.fsmImage = {
           },
           hasValue: {judgment: {sameTitle: true}},
         },
-        services: {}
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'proponentFinalSavedNoSameTitle',
+      description: 'proponentFinalSavedNoSameTitle',
+      from: 'proponentW_President',
+      to: 'boardW_Proponent',
+      atEvent: 'proponentFinalSaved',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: { judgment: { sameTitle: false } },
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'consultantFinalSaved',
+      description: 'consultantFinalSaved',
+      from: 'consultantW_Proponent',
+      to: 'boardW_Consultant',
+      atEvent: 'consultantFinalSaved',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: { judgment: { sameTitle: false } },
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'boardMemberFinalSavedFC',
+      description: 'boardMemberFinalSaved check if final vote and proceed to viewer',
+      from: 'boardW_Consultant',
+      to: 'viewerW_Board',
+      atEvent: 'boardMemberFinalSaved',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: [
+          { boardMembersAllSigned: { params: { application: {}}, return: {boolean: true}, execution: 'sync' }}
+        ]
       },
       effects: {
         response: {
@@ -335,19 +450,450 @@ module.exports.fsmImage = {
       }
     },
     {
-      name: 'proponentFinalSavedNoSameTitle',
-      description: 'President sends it to the appropriete proponent',
-      from: 'proponentW_President',
-      to: 'boardW_Proponent',
-      atEvent: 'proponentFinalSaved',
+      name: 'boardMemberFinalSavedFP',
+      description: 'boardMemberFinalSaved check if final vote and proceed to viewer',
+      from: 'boardW_Proponent',
+      to: 'viewerW_Board',
+      atEvent: 'boardMemberFinalSaved',
       preconditions: {
         request: {
           hasStructure: {
             application: {}
           },
-          hasValue: { judgment: { sameTitle: false } },
+          hasValue: {},
         },
-        services: {}
+        services: [
+          { boardMembersAllSigned: { params: { application: {} }, return: { boolean: true }, execution: 'sync' } }
+        ]
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'boardMemberFinalSavedFPr',
+      description: 'boardMemberFinalSaved check if final vote and proceed to viewer',
+      from: 'boardW_President',
+      to: 'viewerW_Board',
+      atEvent: 'boardMemberFinalSaved',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: [
+          { boardMembersAllSigned: { params: { application: {} }, return: { boolean: true }, execution: 'sync' } }
+        ]
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'boardMemberMoreInfoFC',
+      description: 'boardMemberMoreInfo needed by one of the board members',
+      from: 'boardW_Consultant',
+      to: 'proponentW_Board',
+      atEvent: 'boardMemberMoreInfo',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'boardMemberMoreInfoFP',
+      description: 'boardMemberMoreInfo needed by one of the board members',
+      from: 'boardW_Proponent',
+      to: 'proponentW_Board',
+      atEvent: 'boardMemberMoreInfo',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'boardMemberMoreInfoFPr',
+      description: 'boardMemberMoreInfo needed by one of the board members',
+      from: 'boardW_President',
+      to: 'proponentW_Board',
+      atEvent: 'boardMemberMoreInfo',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'proponentRedifineCourses',
+      description: 'proponentRedifineCourses to consultant',
+      from: 'proponentW_Board',
+      to: 'consultantW_Proponent',
+      atEvent: 'proponentRedifineCourses',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'proponentFillInfo',
+      description: 'proponentFillInfo to consultant',
+      from: 'proponentW_Board',
+      to: 'boardW_Proponent',
+      atEvent: 'proponentFillInfo',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'viewerCheckedFB',
+      description: 'viewerChecked to president',
+      from: 'viewerW_Board',
+      to: 'presidentW_Viewer',
+      atEvent: 'viewerChecked',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'viewerCheckedFP',
+      description: 'viewerChecked to president',
+      from: 'viewerW_Proponent',
+      to: 'presidentW_Viewer',
+      atEvent: 'viewerChecked',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'viewerCheckedFV',
+      description: 'viewerChecked to president',
+      from: 'viewerW_Vice',
+      to: 'presidentW_Viewer',
+      atEvent: 'viewerChecked',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'presidentDisagree',
+      description: 'presidentDisagree with board sends back to board',
+      from: 'presidentW_Viewer',
+      to: 'boardW_President',
+      atEvent: 'presidentDisagree',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'presidentAgree',
+      description: 'presidentAgree to print',
+      from: 'presidentW_Viewer',
+      to: 'printDecisionW_',
+      atEvent: 'presidentAgree',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    {
+      name: 'selectedByPrint',
+      description: 'When print selects from print queue',
+      from: 'printDecisionW_',
+      to: 'printDecisionW_President',
+      atEvent: 'selectedByPrechecker',
+      preconditions: {
+        request: {
+          hasStructure: {},
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: { newState: 'isString' },
+          hasValue: {}
+        },
+        // rule engine creates a context and there is no need to carry params around like application
+        servicesRules: {}
+      }
+    },
+    { name: 'presidentBoardDisagreement',
+      description: 'presidentBoardDisagreement to vice',
+      from: 'presidentW_Viewer',
+      to: 'viceW_President',
+      atEvent: 'presidentBoardDisagreement',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'viceDCDecision',
+      description: 'viceDCDecision to president',
+      from: 'viceW_President',
+      to: 'viewerW_Vice',
+      atEvent: 'viceDCDecision',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'printForSigning',
+      description: 'printForSigning to president',
+      from: 'printDecisionW_President',
+      to: 'presidentW_PrintDecision',
+      atEvent: 'printForSigning',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'presidentSigned',
+      description: 'presidentSigned to user',
+      from: 'presidentW_PrintDecision',
+      to: 'finalized',
+      atEvent: 'presidentSigned',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
+          { saveDB: { params: { application: {}, nextState: 'userW_' } } }
+        ]
+      }
+    },
+    { name: 'actdownloadedByUser',
+      description: 'actdownloadedByUser',
+      from: 'finalized',
+      to: 'forArchive',
+      atEvent: 'actdownloadedByUser',
+      preconditions: {
+        request: {
+          hasStructure: {
+            application: {}
+          },
+          hasValue: {},
+        },
+        services: []
       },
       effects: {
         response: {

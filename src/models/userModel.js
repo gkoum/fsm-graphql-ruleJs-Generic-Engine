@@ -37,7 +37,7 @@ const user = (sequelize, DataTypes) => {
   }
 
   User.associate = models => {
-    User.hasMany(models.Application, { onDelete: 'CASCADE' });
+    User.hasMany(models.Applications, { onDelete: 'CASCADE' });
   }
 
   User.findByLogin = async login => {
@@ -54,8 +54,8 @@ const user = (sequelize, DataTypes) => {
     return user
   }
 
-  User.validateUser = async user => {
-    // check Authorizaton and return it
+  User.validateUser = async (user, subject) => {
+    // check Authorizaton (roles, priviliges) and return it
     return {
       user: user,
       roles: ['prechecker', 'proponent'],

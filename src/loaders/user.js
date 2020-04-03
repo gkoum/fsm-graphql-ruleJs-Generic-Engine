@@ -1,5 +1,5 @@
 export const batchUsers = async (keys, models) => {
-  const users = await models.User.findAll({
+  const users = await models.Users.findAll({
     where: {
       id: {
         $in: keys,

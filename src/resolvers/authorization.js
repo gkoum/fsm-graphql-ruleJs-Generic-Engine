@@ -32,9 +32,9 @@ export const isApplicationOwner = async (
   { models, me },
 ) => {
   console.log('isApplicationOwner', id)
-  const application = await models.Application.findByPk(id, { raw: true });
+  const application = await models.Applications.findByPk(id, { raw: true });
 
-  if (application.userId !== me.id) {
+  if (application.externalUsersId !== me.id) {
     throw new ForbiddenError('Not authenticated as owner.');
   }
 

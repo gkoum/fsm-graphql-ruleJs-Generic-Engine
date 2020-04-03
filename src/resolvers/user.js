@@ -40,7 +40,7 @@ export default {
         password,
       });
 
-      return { token: createToken(user, secret, '30m') };
+      return { token: createToken(user, secret, '30m') }
     },
 
     signIn: async (
@@ -48,7 +48,7 @@ export default {
       { login, password },
       { models, secret },
     ) => {
-      const user = await models.User.findByLogin(login);
+      const user = await models.User.findByLogin(login)
 
       if (!user) {
         throw new UserInputError(
@@ -59,17 +59,17 @@ export default {
       const isValid = await user.validatePassword(password);
 
       if (!isValid) {
-        throw new AuthenticationError('Invalid password.');
+        throw new AuthenticationError('Invalid password.')
       }
 
-      return { token: createToken(user, secret, '30m') };
+      return { token: createToken(user, secret, '30m') }
     },
 
     updateUser: combineResolvers(
       isAuthenticated,
       async (parent, { username }, { models, me }) => {
-        const user = await models.User.findByPk(me.id);
-        return await user.update({ username });
+        const user = await models.User.findByPk(me.id)
+        return await user.update({ username })
       },
     ),
 
@@ -84,19 +84,19 @@ export default {
   },
 
   User: {
-    messages: async (user, args, { models }) => {
-      return await models.Message.findAll({
-        where: {
-          userId: user.id,
-        }
-      })
-    },
+    // messages: async (user, args, { models }) => {
+    //   return await models.Message.findAll({
+    //     where: {
+    //       userId: user.id,
+    //     }
+    //   })
+    // },
     applications: async (user, args, { models }) => {
-      return await models.Application.findAll({
+      return await models.Applications.findAll({
         where: {
-          userId: user.id,
+          externalUsersId: user.id,
         },
-      });
+      })
     }
   }
 }

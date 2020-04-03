@@ -4,8 +4,22 @@ const { fsmImage } = require('../models/fsmImage')
 import pubsub, { EVENTS } from '../subscription'
 import { isAuthenticated, isApplicationOwner } from './authorization'
 
+function delay(t, v) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve.bind(null, v), t)
+  });
+}
+
 export default {
   Query: {
+    fsm: async (parent, { }, { activeFsm, models }) => {
+      console.log(activeFsm)
+      return {
+        states: activeFsm.states,
+        events: activeFsm.events,
+        transitions: activeFsm.transitions.map(trans => JSON.stringify(trans))
+      }
+    },
     event: async (parent, { name }, { models }) => {
       // map the event-name to an existing event on fsm
       console.log(name)
@@ -42,52 +56,76 @@ export default {
     }
   },
   Mutation: {
+    updateFsm: async (parent, { name, fsm }, { models, me }) => {
+      // const fsm = await models.Fsm.create({
+      //   states: fsmImage.states,
+      //   transitions: fsmImage.transitions,
+      //   events: fsmImage.events,
+      // })
+      console.log(fsm)
+      const fsmDb = await models.Fsm.findByPk(1)
+      return await fsmDb.update({ 
+        states: fsm.states,
+        transitions: fsm.transitions,
+        events: fsm.events
+      })
+
+      // return fsm
+    },
     event: async (parent, { name, body }, { models, me }) => {
-      console.log(name, body)
+      console.log(parent, name, body, me)
 
       // map the event-name to an existing event on fsm
       if (!fsmImage.events.find(event => event.name === name)) {
-        console.log('Event not Supported')
+        console.log('---Event not Supported')
         return { name, judgment: 'Event not Supported' }
       }
 
       // Fetch and validate user with fsmSubject for the specific Event from db
-      let userFromToken = { name: 'Giannis', surname: 'Koumoutsos', id: 10 }
-      const fsmSubject = await models.Application.findByPk(body.applicationId)
+      let userFromToken = await delay(2000, {
+        name: 'Giannis', surname: 'Koumoutsos', id: 10, roles: ['prechecker', 'admin']
+      })
 
-      const validateUser = await models.User.validateUser(userFromToken, fsmSubject)
-      console.log(validateUser)
+      let fsmSubject = await models.Applications.findByPk(body.application.id)
+      fsmSubject = fsmSubject.dataValues
+      console.log('----------- fsmSubject', fsmSubject)
+
+      const validateUser = await models.Users.validateUser(userFromToken, fsmSubject)
       if (validateUser.roles.length === 0 || !validateUser.canIssueEvent || !validateUser.subjectBelongsToUser) {
-        return { name, judgment: 'User not Authenticated-Authorized' }
+        return { name, judgment: '---User not Authenticated-Authorized' }
       }
 
       // Check if subject in state that can accept this Event
-      const validateEventForSubject = await models.Application.validateEventForSubject(fsmSubject)
+      const validateEventForSubject = await models.Applications.validateEventForSubject({
+        subject: fsmSubject,
+        event: name
+      })
       if (!validateEventForSubject) {
-        return { name, judgment: 'Transition or Event not applicable for Subject' }
+        return { name, judgment: '---Transition or Event not applicable for Subject' }
       }
 
       // find next state if transition depends on requests params (e.g. judgment.pending)
       const transition = await models.Fsm
         .validateTransitionRequest({ eventBody: body, event: name })
-      if (!transition) { return { name, judgment: 'Transition could not be located' } }
+      if (!transition) { return { name, judgment: '---Transition could not be located' } }
 
       // Preconditions: validate transition request = {structure + specific values(were checked fοr transition) + needed actions}
-      const structureApproved = await models.Application
-        .validateStructure({ application: body, structure: body })
+      const structureApproved = await models.Applications
+        .validateStructure({ application: body, structure: transition.preconditions.request.hasStructure })
       const preActionsOk = await models.Fsm
-        .executePreActions({ application: body, transition: transition })
+        .executePreActions({ fsmSubject: fsmSubject, transition: transition })
       console.log(structureApproved, preActionsOk)
       if (!structureApproved || !preActionsOk) {
         return { name, judgment: 'Preconditions Failed' }
       }
 
       // Effects: move to new state and take all actions
-      const effectsApplied = await models.Fsm.applyEffects({ application: body, transition: transition })
+      const effectsApplied = await models.Fsm.applyEffects({ fsmSubject: fsmSubject, transition: transition, body: body })
       if (effectsApplied) {
-        console.log('effects applied')
+        console.log('---Εffects applied')
         return { // each request has each own return described in transition as return.
-          name, applicationId: body.applicationId, judgment: transition.name, userId: body.userId, roleId: body.roleId
+          name, applicationId: body.applicationId, judgment: transition.name, roleId: body.roleId,
+          newState: transition.to
         }
       } else {
         return { name, judgment: 'Effects could not be applied' }
