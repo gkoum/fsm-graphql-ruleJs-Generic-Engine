@@ -39,7 +39,7 @@
     "graphql-iso-date": "^3.6.1",
     "graphql-resolvers": "^0.2.2",
     "jsonwebtoken": "^8.4.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mysql2": "^2.1.0",
     "rules-js": "^1.0.0",
     "sequelize": "^5.21.4"
