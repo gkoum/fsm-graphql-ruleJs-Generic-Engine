@@ -10,19 +10,23 @@ import {
   AuthenticationError,
 } from 'apollo-server-express'
 
+
 import schema from './schema'
 import resolvers from './resolvers'
 import models, { sequelize } from './models'
 import loaders from './loaders'
 import { fsmImage } from './models/fsmImage'
+import { wizardImage } from './models/wizardImage'
+import { wizardDesignProcess } from './models/wizardDesignProcess'
 
 const app = express()
 
-app.locals.activeFsm = models.Fsm.findByPk(2)
-// console.dir(app.locals)
+app.locals.activeFsm = fsmImage
+app.locals.activeWizard = wizardImage
+app.locals.wizardDesignProcess = wizardDesignProcess
 
 app.use(cors())
-
+// app.use(bodyParser.urlencoded());
 app.use(morgan('dev'))
 
 const getMe = async req => {
@@ -61,6 +65,8 @@ const server = new ApolloServer({
     };
   },
   context: async ({ req, connection }) => {
+    let activeFsm = await fsmImage// models.Fsm.findByPk(2)
+    // console.log(fsmImage)
     if (connection) {
       return {
         models,
@@ -78,7 +84,8 @@ const server = new ApolloServer({
       return {
         models,
         me,
-        activeFsm: app.locals.activeFsm,
+        activeFsm: activeFsm,
+        wizardDesignProcess: wizardDesignProcess,
         secret: process.env.SECRET,
         loaders: {
           user: new DataLoader(keys =>

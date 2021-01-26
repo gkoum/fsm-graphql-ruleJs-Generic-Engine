@@ -6,6 +6,7 @@ import fsmSchema from './fsmSchema';
 import applicationSchema from './applicationSchema';
 import boardSchema from './boardSchema';
 import applicationRoutesSchema from './applicationRoutesSchema';
+import wizardSchema from './wizardSchema';
 
 const linkSchema = gql`
   scalar Date
@@ -28,6 +29,7 @@ export default [
   userSchema,
   messageSchema,
   fsmSchema,
+  wizardSchema,
   applicationSchema,
   boardSchema,
   applicationRoutesSchema

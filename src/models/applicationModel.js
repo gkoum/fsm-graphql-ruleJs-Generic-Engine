@@ -33,11 +33,11 @@ const application = (sequelize, DataTypes) => {
   //   Application.belongsTo(models.User)
   // }
 
-  Application.validateEventForSubject = ({ application: application, event: event } = {}) => {
-    // if application.state can accept the incoming event... same as validateTransitionRequest?
-    console.log('---validateEventForSubject') // , application, values)
-    return true
-  }
+  // Application.validateEventForSubject = ({ fsmSubject, event } = {}) => {
+  //   // if application.state can accept the incoming event... same as validateTransitionRequest?
+  //   console.log('---validateEventForSubject: ', event) // , application, values)
+  //   return true
+  // }
 
   Application.validateStructure = ({ application: application, structure: structure } = {}) => {
     console.log('---validateStructure', application, structure)

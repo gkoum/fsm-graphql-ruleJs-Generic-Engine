@@ -1,5 +1,11 @@
 import calcUserFinalSavedAppStructure from '../structures/structures'
 
+const ui = [
+  ['{"label": "First Name", "minLength": 4, "maxLength": 50, "help": "( Your full Name )"}',
+    '{ "label": "Age", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}'
+  ]
+]
+
 module.exports.fsmImage = {
   validateUser: function (userId, token) {
     console.log(`received id: ${userId} and token: ${token} and start async user validation`)
@@ -7,42 +13,72 @@ module.exports.fsmImage = {
   nextState: function (currentState, event) {
     return this.transitions.find(trans => trans.atEvent === event && trans.from == currentState);
   },
-  states: [
-    { name: 'Χρήστης', description: 'Εξωτερικός Χρήστης', params: { x: -600, y: -300 } },
-    { name: 'Προέλεγχος', params: { x: -400, y: -300 }, description: 'Εξωτερικός Χρήστης' },
-    { name: 'Εισηγητής', params: { x: -200, y: -300 }, description: 'Εξωτερικός Χρήστης' },
-    {
-      name: 'Πρόεδρος', description: 'Εξωτερικός Χρήστης',
-      params: {x: 10, y: -300}
+  roles: [
+    { 
+      name: 'user',
+      hasAccess: ['userW_'],
+      events: ['newApplication', 'userTempSaved', 'userFinalSaved']
     },
     {
+      name: 'PreChecker',
+      hasAccess: ['precheckersQueue', 'precheckerW_'],
+      events: ['selectedByPrechecker', 'precheckerTempSaved', 'precheckerFinalSaved']
+    },
+    { 
+      name: 'SpecialProponent',
+      hasAccess: ['proponentW_President', 'proponentW_Board'],
+      events: ['proponentTempSaved', 'proponentFinalSaved']
+    },
+  ],
+  states: [
+    { 
+      name: 'User', description: 'Εξωτερικός Χρήστης',
+      params: { x: -600, y: -300 }
+    },
+    { 
+      name: 'Prechecker', description: 'Εξωτερικός Χρήστης',
+      params: { x: -400, y: -300 }
+    },
+    { 
+      name: 'Proponent', description: 'Εξωτερικός Χρήστης',
+      params: { x: -200, y: -300 }
+    },
+    { 
+      name: 'President', description: 'Εξωτερικός Χρήστης',
+      params: {x: 10, y: -300}
+    },
+    { 
       name: 'Διοικιτηκός', description: 'Εξωτερικός Χρήστης',
       params: { x: 200, y: -300 }
-      
     },
     {
       name: 'Συμβούλιο', description: 'Εξωτερικός Χρήστης',
       params: { x: 400, y: -300 }
-      
     },
-    {
+    { 
       name: 'Ακαδημαικός', description: 'Εξωτερικός Χρήστης',
       params: { x: 600, y: -300 }
-      
     },
-    {
+    { 
       name: 'Αντιπρόεδρος', description: 'Εξωτερικός Χρήστης',
       params: { x: 800, y: -300 }
-      
     },
-    {
+    { 
       name: 'Print', description: 'Εξωτερικός Χρήστης',
       params: { x: 1000, y: -300 }
-      
     },
-    { name: 'userW_', description: 'Εξωτερικός Χρήστης', params: { x: -600, y: -250 } },
-    { name: 'precheckersQueue', description: 'Ουρά προελέγχου', params: { x: -400, y: -250 } },
-    { name: 'precheckerW_', description: 'Προέλεγχος', params: { x: -400, y: 200 } },
+    { name: 'userW_', description: 'Εξωτερικός Χρήστης',
+      params: { x: -600, y: -250 },
+      ui: ui
+    },
+    { name: 'precheckersQueue', description: 'Ουρά προελέγχου',
+      params: { x: -400, y: -250 }
+    },
+    { name: 'precheckerW_', description: 'Προέλεγχος',
+      params: { x: -400, y: 200 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker']
+      // possibly a transitions: [] will be build for execution speed
+    },
     { name: 'presidentW_Prechecker', description: 'Πρόεδρος από Προέλεγχο', params: { x: 10, y: -250 } },
     { name: 'proponentW_President', description: 'Εισηγητής από Πρόεδρο', params: { x: -200, y: -250 } },
     { name: 'proponentW_Board', description: 'Εισηγητής από Εκτελεστική επιτροπή', params: { x: -200, y: 200 } },
@@ -85,16 +121,16 @@ module.exports.fsmImage = {
     { name: 'presidentAgree', description: 'to print', body: {} },
     { name: 'presidentBoardDisagreement', description: 'to vice', body: {} },
     { name: 'viceDCDecision', description: 'to viewer', body: {} },
+    { name: 'selectedByPrintDecision', description: 'to print', body: {} },
     { name: 'printForSigning', description: 'to president', body: {} },
     { name: 'selectedByPrint', description: '', body: {} },
     { name: 'presidentSigned', description: 'waitForDownload', body: {} },
     { name: 'actdownloadedByUser', description: 'waitForDownload', body: {} },
   ],
   transitions: [
-    {
-      name: 'newApplication',
+    { name: 'newApplication',
       description: 'User creates a new application',
-      from: '',
+      from: 'start',
       to: 'userW_',
       atEvent: 'newApplication',
       preconditions: {
@@ -150,6 +186,63 @@ module.exports.fsmImage = {
         ]
       }
     },
+    {
+      name: 'precheckerTempSaved',
+      description: 'Prechecker temp saved an application',
+      from: 'precheckerW_',
+      to: 'precheckerW_',
+      atEvent: 'precheckerTempSaved',
+      preconditions: {
+        request: {
+          hasStructure: {
+            judgment: {
+              pending: { required: true, type: 'isBoolean' },
+              pendingReason: { required: true, type: 'isString' },
+              academicField: { id: null, name: null },
+              attachedDocuments: [
+                {
+                  applicantComment: "",
+                  date: null,
+                  id: { required: true, type: 'isNumber' },
+                  name: "testing-file-2.pdf",
+                  precheckerChecked: false,
+                  precheckerComment: "",
+                  type: 2
+                }
+              ],
+              color: null,
+              internalComment: null,
+              pending: false,
+              pendingReason: "",
+              queue: null
+            }
+          },
+          hasValue: {},
+        },
+        services: []
+      },
+      effects: {
+        response: {
+          haStructure: {},
+          hasValue: {}
+        },
+        services: [
+        // define input-output and run tests with the actual functions on startup
+          { 
+            insertJudgment: {
+              params: { fsmSubject: {}, eventBody: {} },
+              return: { lastHistoryStep: {} }
+            }
+          },
+          {
+            saveDB: {
+              params: { lastHistoryStep: {}, newHistoryStep:{} },
+              return: { done: 'boolean' }
+            }
+          }
+        ]
+      }
+    },
     { name: 'precheckerFinalSavedPending',
       description: 'Prechecker concludes working on an application',
       from: 'precheckerW_',
@@ -158,13 +251,31 @@ module.exports.fsmImage = {
       preconditions: {
         request: {
           hasStructure: {
-            state: { required: true, type: 'isString' },
-            id: { required: true, type: 'isNumber' },
-            name: { required: true, type: 'isString' }
+            judgment: {
+              pending: { required: true, type: 'isBoolean' },
+              pendingReason: { required: true, type: 'isString' },
+              academicField: { id: null, name: null },
+              attachedDocuments: [
+                {
+                  applicantComment: "",
+                  date: null,
+                  id: { required: true, type: 'isNumber' },
+                  name: "testing-file-2.pdf",
+                  precheckerChecked: false,
+                  precheckerComment: "",
+                  type: 2
+                }
+              ],
+              color: null,
+              internalComment: null,
+              pending: false,
+              pendingReason: "",
+              queue: null
+            }
           },
-          hasValue: { judgment: { pending: true }, userId: '1' },
+          hasValue: { judgment: { pending: true }, roleId: '12' },
         },
-        services: []
+        services: [{ notifyUser: { params: { application: {}, nextState: 'userW_' }, execution: 'async' } }]
       },
       effects: {
         response: {
@@ -172,15 +283,33 @@ module.exports.fsmImage = {
           hasValue: {}
         },
         services: [
-          {insertJudgment: { params: {} } }, // look for judgment and insert it to current step
           {
-            insertHistoryStep: {
-              params: { application: {}, nextState: 'userW_' },
+            insertJudgment: {
+              params: { fsmSubject: {}, eventBody: {} },
+              return: { lastHistoryStep: {} }
+            }
+          },
+          {
+            newHistoryStep: {
+              params: { fsmSubject: {}, nextState: 'userW_' },
+              return: { newHistoryStep: {} },
               execution: 'sync'
             }
           },
-          { saveDB: { params: { application: {}, nextState: 'userW_' } } },
-          { notifyUser: { params: { application: {}, nextState: 'userW_' }, execution: 'async' } }
+          {
+            saveDB: {
+              params: { lastHistoryStep: {}, newHistoryStep: {} },
+              return: { saveDB: true },
+              execution: 'sync'
+            }
+          },
+          {
+            notifyUser: {
+              params: { fsmSubject: {}, lastHistoryStep: {}, newHistoryStep: {} },
+              return: { notifyUser: true },
+              execution: 'async'
+            } 
+          }
         ]
       }
     },
@@ -190,23 +319,24 @@ module.exports.fsmImage = {
       to: 'presidentW_Prechecker',
       atEvent: 'precheckerFinalSaved',
       preconditions: {
-        // user previliges and transitionRequest are checked in the event resolver
         request: {
           hasStructure: {
             state: { required: true, type: 'isString' },
             id: { required: true, type: 'isNumber' },
             name: { required: true, type: 'isString' }
           },
+          // hasValue: { judgment: { pending: true }, roleId: '11' },
           hasValue: { judgment: { pending: false } },
         },
         services: []
       },
       effects: {
         response: {
-          haStructure: { newState: 'isString' },
+          hasStructure: { newState: 'isString' },
           hasValue: {}
         },
         // rule engine creates a context and there is no need to carry params around like application
+        // services: []
         servicesRules: {
           "name": "precheckerFinalSavedNoPendingEffectServices",
           "rules": [
@@ -449,8 +579,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'boardMemberFinalSavedFP',
+    { name: 'boardMemberFinalSavedFP',
       description: 'boardMemberFinalSaved check if final vote and proceed to viewer',
       from: 'boardW_Proponent',
       to: 'viewerW_Board',
@@ -477,8 +606,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'boardMemberFinalSavedFPr',
+    { name: 'boardMemberFinalSavedFPr',
       description: 'boardMemberFinalSaved check if final vote and proceed to viewer',
       from: 'boardW_President',
       to: 'viewerW_Board',
@@ -530,8 +658,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'boardMemberMoreInfoFP',
+    { name: 'boardMemberMoreInfoFP',
       description: 'boardMemberMoreInfo needed by one of the board members',
       from: 'boardW_Proponent',
       to: 'proponentW_Board',
@@ -556,8 +683,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'boardMemberMoreInfoFPr',
+    { name: 'boardMemberMoreInfoFPr',
       description: 'boardMemberMoreInfo needed by one of the board members',
       from: 'boardW_President',
       to: 'proponentW_Board',
@@ -657,8 +783,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'viewerCheckedFP',
+    { name: 'viewerCheckedFP',
       description: 'viewerChecked to president',
       from: 'viewerW_Proponent',
       to: 'presidentW_Viewer',
@@ -683,8 +808,7 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'viewerCheckedFV',
+    { name: 'viewerCheckedFV',
       description: 'viewerChecked to president',
       from: 'viewerW_Vice',
       to: 'presidentW_Viewer',
@@ -759,12 +883,11 @@ module.exports.fsmImage = {
         ]
       }
     },
-    {
-      name: 'selectedByPrint',
+    { name: 'selectedByPrint',
       description: 'When print selects from print queue',
       from: 'printDecisionW_',
       to: 'printDecisionW_President',
-      atEvent: 'selectedByPrechecker',
+      atEvent: 'selectedByPrintDecision',
       preconditions: {
         request: {
           hasStructure: {},

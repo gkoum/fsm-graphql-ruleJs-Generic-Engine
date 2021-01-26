@@ -23,6 +23,12 @@ export default gql`
     events: [event]!
   }
 
+  input wizardEvent {
+    name: String!
+    description: String
+    body: String
+  }
+
   input event {
     name: String!
     description: String
@@ -30,12 +36,17 @@ export default gql`
   }
 
   input state {
-    name: String!,
+    ui: [[String]]
+    title: String
+    label: String
+    id: String
+    name: String!
     description: String
     params: params
   }
 
   input params {
+    ui: [[String]]
     x: Int
     y: Int
   }
@@ -69,7 +80,7 @@ export default gql`
   }
 
   input requestBody {
-    applicationId: ID,
+    fsmObjectId: ID,
     judgment: judgement,
     application: application
     roleId: ID
@@ -102,9 +113,11 @@ export default gql`
   type responseBody {
     name: String!,
     judgment: String,
-    applicationId: ID,
+    fsmObjectId: ID,
     roleId: ID
+    currentState: String
     newState: String
+    error: String
   }
 
   type Event {
@@ -119,20 +132,32 @@ export default gql`
   }
 
   type Fsm {
+    roles: [Roles]
     states: [State]!
     transitions: [String]!
     events: [Event]!
   }
 
+  type Roles {
+    name: String,
+    hasAccess: [String],
+    events: [String]
+  }
+
   type State {
-    name: String!,
-    description: String!
+    ui: [[String]]
+    title: String
+    label: String
+    id: String
+    name: String!
+    description: String
     params: Params
   }
 
   type Params {
     x: Int
     y: Int
+    ui: [[String]]
   }
 
   type Transition {

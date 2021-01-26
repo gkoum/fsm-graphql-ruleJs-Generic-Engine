@@ -82,11 +82,11 @@ module.exports = function(sequelize, DataTypes) {
 	}, {
 		tableName: 'applications'
   });
-  Applications.validateEventForSubject = ({ application: application, event: event } = {}) => {
-    // if application.state can accept the incoming event... same as validateTransitionRequest?
-    console.log('---validateEventForSubject') // , application, values)
-    return true
-  }
+  // Applications.validateEventForSubject = ({ application: application, event: event } = {}) => {
+  //   // if application.state can accept the incoming event... same as validateTransitionRequest?
+  //   console.log('---validateEventForSubject') // , application, values)
+  //   return true
+  // }
   Applications.validateStructure = ({ application: application, structure: structure } = {}) => {
     console.log('---validateStructure', application, structure)
     if (structures[structure] instanceof Function) {
