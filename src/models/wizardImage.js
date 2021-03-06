@@ -3,6 +3,118 @@
 // 1. a UI-form,
 // 2. a graphql json model and an endpoint
 // 3. a model in a mongo db to store steps data for all users
+// {
+//   $jsonSchema: {
+//     required: [
+//       'states',
+//       'events',
+//       'transitions',
+//       'roles',
+//       'services'
+//     ],
+//     properties: {
+//       states: {
+//         bsonType: 'array',
+//         items: {
+//           bsonType: 'object',
+//           required: [
+//             'name',
+//             'id'
+//           ],
+//           properties: {
+//             name: {
+//               bsonType: 'string',
+//               description: 'must be a string and is required'
+//             },
+//             id: {
+//               bsonType: 'string',
+//               description: 'must be a string and is required'
+//             },
+//             ui: {
+//               bsonType: 'array',
+//               items: {
+//                 bsonType: 'array',
+//                 items: {
+//                   bsonType: 'object'
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       },
+//       events: {
+//         bsonType: 'array'
+//       },
+//       transitions: {
+//         bsonType: 'array',
+//         required: [
+//           'name',
+//           'from',
+//           'to',
+//           'atEvent',
+//           'preconditions',
+//           'effects'
+//         ],
+//         properties: {
+//           name: {
+//             bsonType: 'string',
+//             description: 'must be a string and is required'
+//           },
+//           from: {
+//             bsonType: 'string',
+//             description: 'must be a string and is required'
+//           },
+//           to: {
+//             bsonType: 'string',
+//             description: 'must be a string and is required'
+//           },
+//           atEvent: {
+//             bsonType: 'string',
+//             description: 'must be a string and is required'
+//           },
+//           preconditions: {
+//             bsonType: 'object',
+//             description: 'must be an object and is required',
+//             required: [
+//               'request',
+//               'services'
+//             ],
+//             properties: {
+//               request: {
+//                 bsonType: 'object',
+//                 required: [
+//                   'hasStructure',
+//                   'hasValue'
+//                 ],
+//                 properties: {
+//                   hasStructure: {
+//                     bsonType: 'object'
+//                   },
+//                   hasValue: {
+//                     bsonType: 'array'
+//                   }
+//                 }
+//               },
+//               services: {
+//                 bsonType: 'array'
+//               }
+//             }
+//           },
+//           effects: {
+//             bsonType: 'object',
+//             description: 'must be an object and is required'
+//           }
+//         }
+//       },
+//       roles: {
+//         bsonType: 'array'
+//       },
+//       services: {
+//         bsonType: 'object'
+//       }
+//     }
+//   }
+// }
 module.exports.wizardImage = {
   validateUser: function (userId, token) {
     console.log(`received id: ${userId} and token: ${token} and start async user validation`)
@@ -15,8 +127,8 @@ module.exports.wizardImage = {
       id: 'Personal Data', name: 'Personal Data', description: 'Data for the system',
       ui: [
         [ 
-          '{"label": "First Name", "minLength": 4, "maxLength": 50, "help": "( Your full Name )"}',
-          '{ "label": "Age", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}'
+          {"label": "First Name", "minLength": 4, "maxLength": 50, "help": "( Your full Name )"},
+          { "label": "Age", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}
         ]
       ]
     },
@@ -24,7 +136,7 @@ module.exports.wizardImage = {
       id: 'Fever', name: 'Fever', description: 'Fever',
       ui: [
         [
-          '{ "label": "Fever", "type": "number", "min": 32, "max": 42, "help": "( >= 32 <= 42 )"}',
+          { "label": "Fever", "type": "number", "min": 32, "max": 42, "help": "( >= 32 <= 42 )"},
         ]
       ]
     },
@@ -32,7 +144,7 @@ module.exports.wizardImage = {
       id: 'Coughing', name: 'Coughing', description: 'newSystem',
       ui: [
         [
-          `{ "label": "Coughing",
+          { "label": "Coughing",
             "type": "select",
             "iconLeft": "globe-americas",
             "placeholder": "Select your option",
@@ -41,7 +153,7 @@ module.exports.wizardImage = {
               "Less often",
               "Rarelly"
             ]
-          }`,
+          },
         ]
       ]
     },
@@ -49,7 +161,7 @@ module.exports.wizardImage = {
       id: 'Smell', name: 'Smell', description: 'Smell',
       ui: [
         [
-          `{ "label": "Radio",
+          { "label": "Smell",
             "type": "radio",
               "items": [
                 {
@@ -60,7 +172,7 @@ module.exports.wizardImage = {
                 "The same",
                 "Haven't noticed"
               ]
-            }`,
+            },
         ]
       ]
     },
@@ -75,7 +187,7 @@ module.exports.wizardImage = {
       id: 'fatigue', name: 'fatigue', description: 'Fealing tired',
       ui: [
         [
-          `{
+          {
             "label": "fatigue",
             "type": "checkbox",
             "items": [
@@ -90,7 +202,7 @@ module.exports.wizardImage = {
               },
               "ded"
             ]
-          }`,
+          },
         ]
       ]
     },
@@ -98,7 +210,7 @@ module.exports.wizardImage = {
       id: 'shortness of breath', name: 'shortness of breath', description: 'shortness of breath',
       ui: [
         [
-          `{ "label": "Radio",
+          { "label": "shortness of breath",
             "type": "radio",
               "items": [
                 {
@@ -109,7 +221,7 @@ module.exports.wizardImage = {
                 "Mid",
                 "Low"
               ]
-            }`
+            }
         ]
       ]
     },
@@ -136,7 +248,7 @@ module.exports.wizardImage = {
           },
           // it has to be the same as the form ui
           hasValue: [
-            { name: "First Name", type: "string",value: "Giannis" },
+            { name: "First Name", type: "string" },
             // { name: "Age", value: "1" }
             { name: "Age", type: "number", min: 0, max: 120, gt: 0, lte: 100 }
             // if age>65 high 
@@ -153,9 +265,6 @@ module.exports.wizardImage = {
           hasValue: {}
         },
         services: [
-          { insertHistoryStep: { params: { application: {}, nextState: 'userW_' }, execution: 'sync' } },
-          { saveDB: { params: { application: {}, nextState: 'userW_' } } },
-          { notifyUser: { params: { application: {} }, execution: 'async' } }
         ]
       }
     },
@@ -169,8 +278,7 @@ module.exports.wizardImage = {
         request: {
           hasStructure: {},
           hasValue: [
-            { name: "Fever", type: "number", min: 35, max: 42, gte: 39 },
-            // { name: "Age", type: "number", min: 0, max: 120, gt: 65, lte: 100 }
+            { name: "Fever", type: "number", min: 35, max: 42, gte: 39 }
           ],
         },
         services: []

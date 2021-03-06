@@ -59,12 +59,18 @@ const fsm = (sequelize, DataTypes) => {
     }
   }
 
-  Fsm.validateTransitionRequest = ({ eventBody: body, event, type, allowedTransitions } = {}) => {
+  Fsm.validateTransitionRequest = ({ eventBody: body, event, type, allowedTransitions, numberOfPairs } = {}) => {
     console.log('validateTransitionRequest')
-    console.log(body, event, type, allowedTransitions)
-
-    let subjectPreconditionHasValue = JSON.parse(JSON.stringify(body))
-
+    console.log(typeof body, body, event, type, allowedTransitions)
+    let subjectPreconditionHasValue = {}
+    if (type === 'wizard') {
+      subjectPreconditionHasValue = body
+    } else {
+      subjectPreconditionHasValue = JSON.parse(body)
+    }
+    
+    console.log(typeof subjectPreconditionHasValue, subjectPreconditionHasValue)
+    
     let transTemp = []
     let transAccepted = true
     allowedTransitions.forEach(trans => {
@@ -72,7 +78,7 @@ const fsm = (sequelize, DataTypes) => {
       transAccepted = true
 
       // check if values are given as an array or an object -- must be the same in wizardImage?
-      if (Array.isArray(subjectPreconditionHasValue)) {
+      if (Array.isArray(subjectPreconditionHasValue)) { // FOR WIZARD ONLY
         console.log('----values given as an array')
 
         if (!Array.isArray(hasValue)) {
@@ -80,8 +86,9 @@ const fsm = (sequelize, DataTypes) => {
           return false
         }
 
-        subjectPreconditionHasValue.forEach(pair => {
-          console.log(pair)
+        subjectPreconditionHasValue.slice(-numberOfPairs).forEach(pair => {
+          console.log(pair, numberOfPairs)
+          // we need to use numberOfPairs to pass the values of th last step only for wizard
           let findPairWithName = hasValue.find(subjectPair => subjectPair.name === pair.name)
           // if (findPairWithName && findPairWithName.value === pair.value) {
           //   console.log(trans.name + ' was found')
@@ -99,14 +106,14 @@ const fsm = (sequelize, DataTypes) => {
           }
         })
       } else {
-        for (const key of Object.keys(hasValue)) {
-          console.log(key, hasValue[key], subjectPreconditionHasValue[key])
-          if (!services.deepEqual(hasValue[key], subjectPreconditionHasValue[key])) {
+        // for (const key of Object.keys(hasValue)) {
+        //   console.log(key, hasValue[key], subjectPreconditionHasValue[key])
+          if (!services.deepEqual(hasValue, subjectPreconditionHasValue)) {
             console.log(trans.name + ' was REJECTED')
             transAccepted = false
-            continue
+            // continue
           }
-        }
+        // }
       }
       console.log(transAccepted)
       if (transAccepted === true) {

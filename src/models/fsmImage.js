@@ -1,10 +1,48 @@
 import calcUserFinalSavedAppStructure from '../structures/structures'
 
+// create hole forms for personal_information - titles - attachments and use them on demand
+// userW_.ui.push(titles)
 const ui = [
-  ['{"label": "First Name", "minLength": 4, "maxLength": 50, "help": "( Your full Name )"}',
-    '{ "label": "Age", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}'
+  [
+    '{"label": "First Name", "minLength": 4, "maxLength": 50, "help": "( Your First Name )"}',
+    '{"label": "Last Name", "minLength": 4, "maxLength": 50, "help": "( Your Last Name )"}'
+  ],
+  [
+    '{"label": "Date of Birth", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}'
   ]
 ]
+const ui1 = [
+  [
+    '{"label": "First1 Name", "minLength": 4, "maxLength": 50, "help": "( Your First Name )"}',
+    '{"label": "Date of Birth1", "type": "number", "min": 0, "max": 120, "help": "( >= 0 <= 120 )"}'
+  ]
+]
+
+const services = {
+  // need to check if argument names and types match the actual functions' arguments for all services
+  insertJudgment: {
+    params: { fsmSubject: { }, eventBody: { } },
+    return: { lastHistoryStep: { } }
+  },
+
+  newHistoryStep: {
+    params: { fsmSubject: { }, nextState: 'userW_' },
+    return: { newHistoryStep: { } },
+    execution: 'sync'
+  },
+
+  saveDB: {
+    params: { lastHistoryStep: { }, newHistoryStep: { } },
+    return: { saveDB: true },
+    execution: 'sync'
+  },
+
+  notifyUser: {
+    params: { fsmSubject: { }, lastHistoryStep: { }, newHistoryStep: { } },
+    return: { notifyUser: true },
+    execution: 'async'
+  }
+}
 
 module.exports.fsmImage = {
   validateUser: function (userId, token) {
@@ -13,6 +51,7 @@ module.exports.fsmImage = {
   nextState: function (currentState, event) {
     return this.transitions.find(trans => trans.atEvent === event && trans.from == currentState);
   },
+  services: services,
   roles: [
     { 
       name: 'user',
@@ -22,7 +61,7 @@ module.exports.fsmImage = {
     {
       name: 'PreChecker',
       hasAccess: ['precheckersQueue', 'precheckerW_'],
-      events: ['selectedByPrechecker', 'precheckerTempSaved', 'precheckerFinalSaved']
+      events: ['selectedByPrechecker', 'precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker']
     },
     { 
       name: 'SpecialProponent',
@@ -33,69 +72,168 @@ module.exports.fsmImage = {
   states: [
     { 
       name: 'User', description: 'Εξωτερικός Χρήστης',
-      params: { x: -600, y: -300 }
+      params: { lane: 'self', x: -600, y: -300 }
     },
     { 
-      name: 'Prechecker', description: 'Εξωτερικός Χρήστης',
-      params: { x: -400, y: -300 }
-    },
-    { 
-      name: 'Proponent', description: 'Εξωτερικός Χρήστης',
-      params: { x: -200, y: -300 }
-    },
-    { 
-      name: 'President', description: 'Εξωτερικός Χρήστης',
-      params: {x: 10, y: -300}
-    },
-    { 
-      name: 'Διοικιτηκός', description: 'Εξωτερικός Χρήστης',
-      params: { x: 200, y: -300 }
+      name: 'Prechecker', description: 'Prechecker',
+      params: { lane: 'self', x: -400, y: -300 }
     },
     {
-      name: 'Συμβούλιο', description: 'Εξωτερικός Χρήστης',
-      params: { x: 400, y: -300 }
+      name: 'President', description: 'President',
+      params: { lane: 'self', x: 10, y: -300 }
+    },
+    {
+      name: 'Viewer', description: 'Εξωτερικός Χρήστης',
+      params: { lane: 'self', x: 200, y: -300 }
     },
     { 
-      name: 'Ακαδημαικός', description: 'Εξωτερικός Χρήστης',
-      params: { x: 600, y: -300 }
+      name: 'Proponent', description: 'Proponent',
+      params: { lane: 'self', x: -200, y: -300 }
+    },
+    {
+      name: 'Board', description: 'Εξωτερικός Χρήστης',
+      params: { lane: 'self', x: 400, y: -300 }
     },
     { 
-      name: 'Αντιπρόεδρος', description: 'Εξωτερικός Χρήστης',
-      params: { x: 800, y: -300 }
+      name: 'Consultant', description: 'Εξωτερικός Χρήστης',
+      params: { lane: 'self', x: 600, y: -300 }
+    },
+    { 
+      name: 'VicePresident', description: 'Εξωτερικός Χρήστης',
+      params: { lane: 'self', x: 800, y: -300 }
     },
     { 
       name: 'Print', description: 'Εξωτερικός Χρήστης',
-      params: { x: 1000, y: -300 }
+      params: { lane: 'self', x: 1000, y: -300 }
     },
     { name: 'userW_', description: 'Εξωτερικός Χρήστης',
-      params: { x: -600, y: -250 },
+      params: { lane: 'User', x: -600, y: -250 },
+      events: [
+        'userTempSaved',
+        'userFinalSaved',
+        'actdownloadedByUser'
+      ],
       ui: ui
     },
     { name: 'precheckersQueue', description: 'Ουρά προελέγχου',
-      params: { x: -400, y: -250 }
+      params: { lane: 'Prechecker', x: -400, y: -250 },
+      events: ['selectedByPrechecker'],
+      ui: ui
     },
     { name: 'precheckerW_', description: 'Προέλεγχος',
-      params: { x: -400, y: 200 },
-      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker']
+      params: { lane: 'Prechecker', x: -400, y: 200 },
+      events: [
+        'precheckerTempSaved',
+        'precheckerFinalSaved',
+        'unSelectedByPrechecker'
+      ],
+      ui: ui1
       // possibly a transitions: [] will be build for execution speed
     },
-    { name: 'presidentW_Prechecker', description: 'Πρόεδρος από Προέλεγχο', params: { x: 10, y: -250 } },
-    { name: 'proponentW_President', description: 'Εισηγητής από Πρόεδρο', params: { x: -200, y: -250 } },
-    { name: 'proponentW_Board', description: 'Εισηγητής από Εκτελεστική επιτροπή', params: { x: -200, y: 200 } },
-    { name: 'viewerW_Proponent', description: 'Έλεγχος από Εισηγητή', params: { x: 200, y: -250 } },
-    { name: 'viewerW_Vice', description: 'Έλεγχος από Αντιπρόεδρο', params: { x: 200, y: 100 } },
-    { name: 'viewerW_Board', description: 'Έλεγχος από Εκτελεστική επιτροπή', params: { x: 200, y: 350 } },
-    { name: 'viceW_President', description: 'Αντιπρόεδρος από Πρόεδρο', params: { x: 800, y: -250 } },
-    { name: 'boardW_President', description: 'Εκτελεστική επιτροπή από Πρόεδρο', params: { x: 400, y: -250 } },
-    { name: 'boardW_Proponent', description: 'Εκτελεστική επιτροπή από Εισηγητή', params: { x: 400, y: -10 } },
-    { name: 'boardW_Consultant', description: 'Εκτελεστική επιτροπή από Ακαδημαϊκό', params: { x: 400, y: 320 } },
-    { name: 'printDecisionW_', description: 'Καταχωρητής Απόφασης', params: { x: 1000, y: -200 } },
-    { name: 'presidentW_PrintDecision', description: 'Πρόεδρος από Καταχωρητή', params: { x: 10, y: 100 } },
-    { name: 'consultantW_Proponent', description: 'Ακαδημαϊκός Σύμβουλος από Εισηγητή', params: { x: 600, y: -100 } },
-    { name: 'presidentW_Viewer', description: 'Πρόεδρος', params: { x: 10, y: 400 } },
-    { name: 'printDecisionW_President', description: 'Ουρά καταχωρητών', params: { x: 1000, y: -10 } },
-    { name: 'finalized', description: 'Ολοκληρωμένη-Παραλαβή', params: { x: 10, y: 500 } },
-    { name: 'forArchive', description: 'Για το αρχείο', params: { x: 10, y: 600 } }
+    { name: 'presidentW_Prechecker', description: 'Πρόεδρος από Προέλεγχο',
+      params: { lane: 'President', x: 10, y: -250 },
+      events: [
+        'presidentTempSaved',
+        'presidentAssignToProponent',
+        'presidentDisagree',
+        'presidentAgree',
+        'presidentBoardDisagreement',
+        'presidentSigned'
+      ],
+      ui: ui
+    },
+    { name: 'proponentW_President', description: 'Εισηγητής από Πρόεδρο',
+      params: { lane: 'Proponent', x: -200, y: -250 },
+      events: [
+        'proponentTempSaved',
+        'proponentAssignToConsultant',
+        'proponentFinalSaved',
+        'proponentRedifineCourses',
+        'proponentFillInfo'
+      ],
+      ui: ui
+    },
+    { name: 'proponentW_Board', description: 'Εισηγητής από Εκτελεστική επιτροπή',
+      params: { lane: 'Proponent', x: -200, y: 200 },
+      events: [
+        'proponentTempSaved',
+        'proponentAssignToConsultant',
+        'proponentFinalSaved',
+        'proponentRedifineCourses',
+        'proponentFillInfo'
+      ],
+      ui: ui
+    },
+    { name: 'viewerW_Proponent', description: 'Έλεγχος από Εισηγητή',
+      params: { lane: 'Viewer', x: 200, y: -250 },
+      events: ['viewerChecked'],
+      ui: ui
+    },
+    { name: 'viewerW_Vice', description: 'Έλεγχος από Αντιπρόεδρο',
+      params: { lane: 'Viewer', x: 200, y: 100 },
+      events: ['viewerChecked'],
+      ui: ui
+    },
+    { name: 'viewerW_Board', description: 'Έλεγχος από Εκτελεστική επιτροπή',
+      params: { lane: 'Viewer', x: 200, y: 350 },
+      events: ['viewerChecked'],
+      ui: ui
+    },
+    { name: 'viceW_President', description: 'Αντιπρόεδρος από Πρόεδρο',
+      params: { lane: 'VicePresident', x: 800, y: -250 },
+      events: ['viceDCDecision'],
+      ui: ui
+    },
+    { name: 'boardW_President', description: 'Εκτελεστική επιτροπή από Πρόεδρο',
+      params: { lane: 'Board', x: 400, y: -250 },
+      events: ['boardMemberTempSaved', 'precheckerFinalSaved', 'boardMemberMoreInfo'],
+      ui: ui
+    },
+    { name: 'boardW_Proponent', description: 'Εκτελεστική επιτροπή από Εισηγητή',
+      params: { lane: 'Board', x: 400, y: -10 },
+      events: ['boardMemberTempSaved', 'precheckerFinalSaved', 'boardMemberMoreInfo'],
+      ui: ui
+    },
+    { name: 'boardW_Consultant', description: 'Εκτελεστική επιτροπή από Ακαδημαϊκό',
+      params: { lane: 'Board', x: 400, y: 320 },
+      events: ['boardMemberTempSaved', 'precheckerFinalSaved', 'boardMemberMoreInfo'],
+      ui: ui
+    },
+    { name: 'printDecisionW_', description: 'Καταχωρητής Απόφασης',
+      params: { lane: 'Print', x: 1000, y: -200 },
+      events: ['printForSigning'],
+      ui: ui
+    },
+    { name: 'presidentW_PrintDecision', description: 'Πρόεδρος από Καταχωρητή',
+      params: { lane: 'President', x: 10, y: 100 },
+      events: ['presidentSigned'],
+      ui: ui
+    },
+    { name: 'consultantW_Proponent', description: 'Ακαδημαϊκός Σύμβουλος από Εισηγητή',
+      params: { lane: 'Consultant', x: 600, y: -100 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker'],
+      ui: ui
+    },
+    { name: 'presidentW_Viewer', description: 'Πρόεδρος',
+      params: { lane: 'President', x: 10, y: 400 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker'],
+      ui: ui
+    },
+    { name: 'printDecisionW_President', description: 'Ουρά καταχωρητών',
+      params: { lane: 'Print', x: 1000, y: -10 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker'],
+      ui: ui
+    },
+    { name: 'finalized', description: 'Ολοκληρωμένη-Παραλαβή', 
+      params: { lane: 'President', x: 10, y: 500 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker'],
+      ui: ui
+    },
+    { name: 'forArchive', description: 'Για το αρχείο',
+      params: { lane: 'President', x: 10, y: 600 },
+      events: ['precheckerTempSaved', 'precheckerFinalSaved', 'unSelectedByPrechecker'],
+      ui: ui
+    }
   ],
   events: [
     { name: 'userTempSaved', description: '', body: {} },
@@ -273,9 +411,9 @@ module.exports.fsmImage = {
               queue: null
             }
           },
-          hasValue: { judgment: { pending: true }, roleId: '12' },
+          hasValue: { pending: true },
         },
-        services: [{ notifyUser: { params: { application: {}, nextState: 'userW_' }, execution: 'async' } }]
+        services: [{ notifyUser: services.notifyUser, execution: 'async' }]
       },
       effects: {
         response: {
@@ -283,33 +421,10 @@ module.exports.fsmImage = {
           hasValue: {}
         },
         services: [
-          {
-            insertJudgment: {
-              params: { fsmSubject: {}, eventBody: {} },
-              return: { lastHistoryStep: {} }
-            }
-          },
-          {
-            newHistoryStep: {
-              params: { fsmSubject: {}, nextState: 'userW_' },
-              return: { newHistoryStep: {} },
-              execution: 'sync'
-            }
-          },
-          {
-            saveDB: {
-              params: { lastHistoryStep: {}, newHistoryStep: {} },
-              return: { saveDB: true },
-              execution: 'sync'
-            }
-          },
-          {
-            notifyUser: {
-              params: { fsmSubject: {}, lastHistoryStep: {}, newHistoryStep: {} },
-              return: { notifyUser: true },
-              execution: 'async'
-            } 
-          }
+          { insertJudgment: services.insertJudgment },
+          { newHistoryStep: services.newHistoryStep},
+          { saveDB: services.saveDB},
+          { notifyUser: services.notifyUser}
         ]
       }
     },
@@ -326,7 +441,7 @@ module.exports.fsmImage = {
             name: { required: true, type: 'isString' }
           },
           // hasValue: { judgment: { pending: true }, roleId: '11' },
-          hasValue: { judgment: { pending: false } },
+          hasValue: { pending: false },
         },
         services: []
       },

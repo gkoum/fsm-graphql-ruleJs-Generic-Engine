@@ -23,12 +23,6 @@ export default gql`
     events: [event]!
   }
 
-  input wizardEvent {
-    name: String!
-    description: String
-    body: String
-  }
-
   input event {
     name: String!
     description: String
@@ -49,6 +43,7 @@ export default gql`
     ui: [[String]]
     x: Int
     y: Int
+    lane: String
   }
 
   input transition {
@@ -78,14 +73,26 @@ export default gql`
   input effect {
     description: String
   }
+  # for a REST API: create a standard API with everything and use fsmSchema to validate...
 
+  # only fsmObject and not specifics should be used
+  # has to do with the request for each fsm transition
+  # request: {
+  #   hasStructure: {} -> must include all of them as possible in each mutation-POST Event
+  #   hasValue: {},
+  # },
   input requestBody {
-    fsmObjectId: ID,
-    judgment: judgement,
-    application: application
-    roleId: ID
+    fsmObjectId: ID!,
+    requestBody: String!,
+    user: user
   }
 
+  input user {
+    id: ID!,
+    name: String,
+    role: String
+  }
+  
   input application {
     id: ID!
     personalDetails: personalDetails
@@ -109,8 +116,14 @@ export default gql`
     id: ID!
     judgement: String
   }
-
+  # only fsmObject and not specifics should be used
+  # has to do with the response for each fsm transition
+  # response: {
+  #   hasStructure: {} -> must include all of them as possible in each mutation-POST Event
+  #   hasValue: {},
+  # },
   type responseBody {
+    message: String,
     name: String!,
     judgment: String,
     fsmObjectId: ID,
@@ -126,16 +139,12 @@ export default gql`
     body: String
   }
 
-  input judgement {
-    pending: Boolean
-    sameTitle: Boolean
-  }
-
   type Fsm {
     roles: [Roles]
     states: [State]!
     transitions: [String]!
     events: [Event]!
+    services: String
   }
 
   type Roles {
@@ -158,6 +167,7 @@ export default gql`
     x: Int
     y: Int
     ui: [[String]]
+    lane: String
   }
 
   type Transition {

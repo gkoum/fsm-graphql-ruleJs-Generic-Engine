@@ -25,8 +25,9 @@ export default gql`
 
   type User {
     id: ID!
-    name: String!
-    firstname: String!
+    role: String
+    name: String
+    firstname: String
     surname: String
     gender: String
     applications: [Application!]
